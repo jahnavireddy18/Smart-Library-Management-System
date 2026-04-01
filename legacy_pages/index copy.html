@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8">
+<title>Smart Library System</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Segoe UI,Arial;
+}
+
+/* smooth scrolling */
+
+html{
+scroll-behavior:smooth;
+}
+
+/* BACKGROUND VIDEO */
+
+.bg-video{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+object-fit:cover;
+z-index:-2;
+}
+
+.overlay{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.7);
+z-index:-1;
+}
+
+/* NAVBAR */
+
+.navbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:18px 70px;
+background:rgba(0,0,0,0.6);
+backdrop-filter:blur(10px);
+}
+
+.logo{
+font-size:26px;
+font-weight:700;
+color:white;
+letter-spacing:1px;
+}
+
+nav{
+display:flex;
+gap:35px;
+}
+
+nav a{
+color:white;
+text-decoration:none;
+font-size:16px;
+position:relative;
+transition:.3s;
+}
+
+nav a::after{
+content:"";
+width:0%;
+height:2px;
+background:#00eaff;
+position:absolute;
+bottom:-6px;
+left:0;
+transition:.3s;
+}
+
+nav a:hover::after{
+width:100%;
+}
+
+nav a:hover{
+color:#00eaff;
+}
+
+/* HERO SECTION */
+
+.main-container{
+display:flex;
+flex-wrap:wrap;
+justify-content:space-between;
+align-items:center;
+padding:90px;
+gap:40px;
+color:white;
+}
+
+.left-box{
+max-width:550px;
+flex:1;
+}
+
+.left-box h1{
+font-size:50px;
+margin-bottom:10px;
+}
+
+.tagline{
+color:#00eaff;
+margin-bottom:15px;
+}
+
+.description{
+color:#ddd;
+line-height:1.6;
+margin-bottom:25px;
+}
+
+.features{
+list-style:none;
+margin-bottom:30px;
+}
+
+.features li{
+margin:10px 0;
+font-size:16px;
+}
+
+.hours{
+background:rgba(255,255,255,0.1);
+padding:20px;
+border-radius:12px;
+width:230px;
+backdrop-filter:blur(10px);
+}
+
+.right-section{
+flex:1;
+text-align:center;
+}
+
+.right-logo{
+width:240px;
+border-radius:15px;
+margin-bottom:30px;
+box-shadow:0 20px 40px rgba(0,0,0,0.6);
+}
+
+.right-login-btn{
+display:inline-block;
+padding:14px 45px;
+background:#00eaff;
+color:black;
+font-weight:600;
+border-radius:30px;
+text-decoration:none;
+transition:.3s;
+}
+
+.right-login-btn:hover{
+transform:scale(1.1);
+background:white;
+}
+
+/* STATISTICS */
+
+.stats{
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+gap:30px;
+padding:60px;
+}
+
+.stat-box{
+background:rgba(255,255,255,0.08);
+padding:30px;
+border-radius:15px;
+width:200px;
+text-align:center;
+color:white;
+transition:.3s;
+}
+
+.stat-box:hover{
+transform:translateY(-10px);
+background:rgba(255,255,255,0.15);
+}
+
+.stat-box h2{
+font-size:32px;
+color:#00eaff;
+}
+
+/* BOOK SECTION */
+
+.books{
+padding:80px;
+}
+
+.books h2{
+text-align:center;
+margin-bottom:40px;
+color:white;
+font-size:32px;
+}
+
+.book-grid{
+display:flex;
+flex-wrap:wrap;
+gap:30px;
+justify-content:center;
+}
+
+.book-card{
+background:rgba(255,255,255,0.08);
+border-radius:15px;
+padding:25px;
+width:220px;
+text-align:center;
+color:white;
+transition:.3s;
+}
+
+.book-card:hover{
+transform:scale(1.05);
+background:rgba(255,255,255,0.15);
+}
+
+.book-card img{
+width:100%;
+border-radius:10px;
+margin-bottom:10px;
+}
+
+/* SERVICES */
+
+.services{
+display:flex;
+flex-wrap:wrap;
+gap:30px;
+justify-content:center;
+padding:80px;
+}
+
+.service-card{
+background:rgba(255,255,255,0.08);
+padding:30px;
+width:260px;
+border-radius:15px;
+color:white;
+transition:.3s;
+}
+
+.service-card:hover{
+transform:translateY(-10px);
+background:rgba(255,255,255,0.15);
+}
+
+.service-card h3{
+color:#00eaff;
+margin-bottom:10px;
+}
+
+/* CONTACT */
+
+.contact{
+text-align:center;
+color:white;
+padding:60px;
+}
+
+/* FOOTER */
+
+.footer{
+text-align:center;
+padding:25px;
+background:rgba(0,0,0,0.8);
+color:#ccc;
+}
+
+</style>
+</head>
+
+<body>
+
+<video autoplay muted loop class="bg-video">
+<source src="Discover_Excellence_Your_Future_at_VEMU_Institute_Of_Technology_vemuitchittoor_720P.mp4" type="video/mp4">
+</video>
+
+<div class="overlay"></div>
+
+<header class="navbar">
+
+<div class="logo">📚 Smart Library</div>
+
+<nav>
+<a href="#home">Home</a>
+<a href="#books">Books</a>
+<a href="#services">Services</a>
+<a href="#contact">Contact</a>
+</nav>
+
+</header>
+
+<!-- HOME SECTION -->
+
+<section class="main-container" id="home">
+
+<div class="left-box">
+
+<h1>Welcome to Smart Library</h1>
+
+<h3 class="tagline">Where Knowledge Meets Innovation</h3>
+
+<p class="description">
+The Smart Library Management System allows students
+and teachers to access books, journals and digital
+resources easily through an organized online platform.
+</p>
+
+<ul class="features">
+<li>✔ Digital Book Access</li>
+<li>✔ Online Reservation</li>
+<li>✔ Smart Issue & Return</li>
+<li>✔ Student & Admin Portal</li>
+</ul>
+
+<div class="hours">
+<h4>Library Hours</h4>
+<p>Monday – Saturday</p>
+<p>9:00 AM – 6:00 PM</p>
+</div>
+
+</div>
+
+<div class="right-section">
+
+<img src="logo.jpg" class="right-logo">
+
+<br>
+
+<a href="role.html" class="right-login-btn">Login Portal</a>
+
+</div>
+
+</section>
+
+<!-- STATISTICS -->
+
+<section class="stats">
+
+<div class="stat-box">
+<h2>10K+</h2>
+<p>Total Books</p>
+</div>
+
+<div class="stat-box">
+<h2>5K+</h2>
+<p>Students</p>
+</div>
+
+<div class="stat-box">
+<h2>800+</h2>
+<p>E-Books</p>
+</div>
+
+<div class="stat-box">
+<h2>24/7</h2>
+<p>Digital Access</p>
+</div>
+
+</section>
+
+<!-- BOOKS -->
+
+<section class="books" id="books">
+
+<h2>Popular Books</h2>
+
+<div class="book-grid">
+
+<div class="book-card">
+<img src="data.jpg">
+<h4>Data Structures</h4>
+</div>
+
+<div class="book-card">
+<img src="macine learning.jpg">
+<h4>Machine Learning</h4>
+</div>
+
+<div class="book-card">
+<img src="os.png">
+<h4>Operating Systems</h4>
+</div>
+
+<div class="book-card">
+<img src="computer.jpg">
+<h4>Computer Networks</h4>
+</div>
+
+</div>
+
+</section>
+
+<!-- SERVICES -->
+
+<section class="services" id="services">
+
+<div class="service-card">
+<h3>Book Reservation</h3>
+<p>Reserve books online before visiting the library.</p>
+</div>
+
+<div class="service-card">
+<h3>Digital Library</h3>
+<p>Access thousands of e-books and journals.</p>
+</div>
+
+<div class="service-card">
+<h3>Fine Management</h3>
+<p>Track late return penalties.</p>
+</div>
+
+<div class="service-card">
+<h3>Admin Dashboard</h3>
+<p>Manage books, users and reports.</p>
+</div>
+
+</section>
+
+<!-- CONTACT -->
+
+<section class="contact" id="contact">
+
+<h2>Contact Us</h2>
+
+<p>Email: library@college.edu</p>
+<p>Phone: +91 9676303473</p>
+<p>Location: VEMU Institute of Technology</p>
+
+</section>
+
+<footer class="footer">
+
+<p>© 2026 Smart Library Management System</p>
+
+</footer>
+
+</body>
+</html>
