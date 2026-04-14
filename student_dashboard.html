@@ -177,8 +177,17 @@ all.forEach(d=>notifyBox.innerHTML+=`<p>${d.text}</p>`);
 setInterval(loadNotifications,2000);
 loadNotifications();
 
-function logout(){window.location.href="role.html";}
+function logout(){logout();}
 </script>
 
+<script src="assets/js/auth.js"></script>
+<script>
+  // Check authentication and role on page load
+  if (!checkRole('student')) {
+    // checkRole will handle redirection if authentication fails
+  }
+</script>
+
+<script src="assets/js/voice-assistant.js"></script>
 </body>
 </html>

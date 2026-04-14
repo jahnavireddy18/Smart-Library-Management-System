@@ -60,6 +60,81 @@
   background-clip: text;
 }
 
+/* ── Search Bar ── */
+.search-bar {
+  display: flex;
+  align-items: center;
+  background: rgba(255,255,255,0.1);
+  border-radius: 25px;
+  padding: 0 15px;
+  border: 1px solid rgba(255,255,255,0.2);
+  transition: var(--transition-base);
+}
+
+.search-bar:focus-within {
+  background: rgba(255,255,255,0.15);
+  border-color: rgba(255,255,255,0.4);
+}
+
+.search-bar input {
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 10px 10px 10px 0;
+  color: #fff;
+  font-size: 14px;
+  width: 200px;
+}
+
+.search-bar input::placeholder {
+  color: rgba(255,255,255,0.7);
+}
+
+.search-bar button {
+  background: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: var(--transition-base);
+}
+
+.search-bar button:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+/* ── Hamburger Menu ── */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 5px;
+  padding: 8px;
+  cursor: pointer;
+  gap: 4px;
+}
+
+.hamburger span {
+  width: 20px;
+  height: 2px;
+  background: #fff;
+  transition: var(--transition-base);
+}
+
+.hamburger.active span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburger.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger.active span:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -6px);
+}
+
 /* ── Navigation ── */
 .nav-pill {
   display: flex;
@@ -69,6 +144,20 @@
   border-radius: var(--radius-full);
   padding: 6px;
   border: 1px solid rgba(255,255,255,0.08);
+}
+
+.nav-pill.active {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 100%;
+  right: 20px;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(20px);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  z-index: 1000;
 }
 
 .nav-pill a {
@@ -84,6 +173,12 @@
   color: var(--slate-400);
   transition: var(--transition-base);
   text-decoration: none;
+}
+
+.nav-pill.active a {
+  padding: 12px 20px;
+  margin: 5px 0;
+  justify-content: flex-start;
 }
 
 .nav-pill a:hover {
@@ -111,6 +206,7 @@
   padding: 0 7px;
   transition: var(--transition-base);
   border: 1px solid rgba(255,255,255,0.1);
+  z-index: 10;
 }
 
 .theme-toggle i {
@@ -137,6 +233,55 @@
 
 .theme-toggle.active .knob {
   left: 27px;
+}
+
+/* ── Voice Button ── */
+.voice-btn {
+  width: 40px;
+  height: 40px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 50%;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-base);
+  margin-left: 10px;
+  z-index: 10;
+}
+
+.voice-btn:hover {
+  background: rgba(255,255,255,0.2);
+  transform: scale(1.1);
+}
+
+.voice-btn.listening {
+  background: var(--primary-600);
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* ── Animations ── */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.8s ease-out forwards;
 }
 
 /* ── Hero Content ── */
@@ -527,4 +672,19 @@ body.light .site-footer { background: rgba(248,250,252,0.8); color: var(--slate-
   .hero-logo { width: 140px; height: 140px; }
   .site-header { padding: 0 20px; }
   .books-section, .services-section, .contact-section { padding: 60px 24px; }
+  .nav-pill { display: none; }
+  .hamburger { display: flex; }
+  .search-bar { display: none; } /* Hide search on mobile for space */
+  .theme-toggle { margin-left: auto; order: 2; }
+  .voice-btn { order: 3; }
+}
+
+@media (max-width: 600px) {
+  .hero-left h1 { font-size: 28px; }
+  .hero-page { padding: 100px 16px 40px; }
+  .books-section, .services-section, .contact-section { padding: 40px 16px; }
+  .services-grid { grid-template-columns: 1fr; }
+  .scroll-container { padding: 0 10px; }
+  .book-card { min-width: 120px; }
+  .site-header .brand { font-size: 18px; }
 }

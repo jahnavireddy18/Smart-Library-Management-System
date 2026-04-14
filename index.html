@@ -22,7 +22,12 @@
   </div>
 
   <div style="display:flex;align-items:center;gap:20px;">
-    <nav class="nav-pill">
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Search books...">
+      <button id="searchBtn"><i class="fas fa-search"></i></button>
+    </div>
+
+    <nav class="nav-pill" id="navPill">
       <a href="#home" class="active" data-nav>
         <i class="fa-solid fa-house"></i> Home
       </a>
@@ -37,11 +42,21 @@
       </a>
     </nav>
 
+    <button class="hamburger" id="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
     <div class="theme-toggle" id="themeToggle">
       <i class="fa-solid fa-sun"></i>
       <i class="fa-solid fa-moon"></i>
       <div class="knob"></div>
     </div>
+
+    <button class="voice-btn" id="voiceBtn" title="Voice Assistant">
+      <i class="fas fa-microphone"></i>
+    </button>
   </div>
 </header>
 
@@ -176,7 +191,7 @@
 </footer>
 
 <script src="assets/js/index.js"></script>
+<script src="assets/js/voice-assistant.js"></script>
 
-<script src="assets/js/voice.js"></script>
 </body>
 </html>

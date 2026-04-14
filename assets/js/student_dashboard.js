@@ -1,37 +1,94 @@
+// Student Dashboard - Real Data Integration
+let books = [];
+let currentUser = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+  checkAuthentication();
+  loadBooks();
+  loadUserProfile();
+  loadNotifications();
+});
+
+function checkAuthentication() {
+  const auth = checkRole('student');
+  if (!auth) return;
+
+  currentUser = JSON.parse(localStorage.getItem('user'));
+  document.getElementById('pname').textContent = currentUser.name;
+  document.getElementById('pemail').textContent = currentUser.email;
+}
+
 /* ── Profile ── */
+async function loadUserProfile() {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch('http://localhost:5000/api/users/profile', {
+      headers: {
+        'x-auth-token': token
+      }
+    });
+
+    if (response.ok) {
+      const profile = await response.json();
+      updateProfileDisplay(profile);
+    }
+  } catch (error) {
+    console.error('Error loading profile:', error);
+  }
+}
+
+function updateProfileDisplay(profile) {
+  document.getElementById('pname').textContent = profile.name;
+  document.getElementById('pemail').textContent = profile.email;
+  document.getElementById('name').value = profile.name;
+  document.getElementById('email').value = profile.email;
+  document.getElementById('phone').value = profile.phone || '';
+  document.getElementById('branch').value = profile.department || '';
+
+  // Update borrowed books count
+  const borrowedCount = profile.borrowedBooks ? profile.borrowedBooks.length : 0;
+  document.getElementById('borrowedBooksCount').textContent = borrowedCount;
+
+  // Update fines
+  document.getElementById('finesAmount').textContent = `₹${profile.fines || 0}`;
+}
+
 function toggleProfile() { document.getElementById('profileDrop').classList.toggle('active'); }
 function openProfile() { document.getElementById('profileDrop').classList.add('active'); }
 
 function enableEdit() { document.querySelectorAll('#profileDrop input').forEach(i => i.disabled = false); }
 
-function saveProfile() {
-  let profile = {
+async function saveProfile() {
+  const profileData = {
     name: document.getElementById('name').value,
     email: document.getElementById('email').value,
     phone: document.getElementById('phone').value,
-    branch: document.getElementById('branch').value,
-    img: document.getElementById('profileImg').src
+    department: document.getElementById('branch').value
   };
-  localStorage.setItem('studentProfile', JSON.stringify(profile));
-  loadProfile();
-  document.querySelectorAll('#profileDrop input').forEach(i => i.disabled = true);
-}
 
-function loadProfile() {
-  let p = JSON.parse(localStorage.getItem('studentProfile'));
-  if (!p) return;
-  document.getElementById('pname').innerText = p.name;
-  document.getElementById('pemail').innerText = p.email;
-  document.getElementById('name').value = p.name;
-  document.getElementById('email').value = p.email;
-  document.getElementById('phone').value = p.phone;
-  document.getElementById('branch').value = p.branch;
-  if (p.img) {
-    document.getElementById('profileImg').src = p.img;
-    document.getElementById('topProfileImg').src = p.img;
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch('http://localhost:5000/api/users/profile', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-auth-token': token
+      },
+      body: JSON.stringify(profileData)
+    });
+
+    if (response.ok) {
+      alert('Profile updated successfully');
+      loadUserProfile(); // Refresh profile
+      document.querySelectorAll('#profileDrop input').forEach(i => i.disabled = true);
+    } else {
+      alert('Failed to update profile');
+    }
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    alert('Network error. Please try again.');
   }
 }
-loadProfile();
 
 function uploadImage(e) {
   let file = e.target.files[0];
@@ -44,11 +101,139 @@ function uploadImage(e) {
   reader.readAsDataURL(file);
 }
 
+/* ── Books ── */
+async function loadBooks() {
+  try {
+    const response = await fetch('http://localhost:5000/api/books');
+
+    if (response.ok) {
+      books = await response.json();
+      displayBooks(books);
+      updateBookStats();
+    } else {
+      throw new Error('Failed to fetch books');
+    }
+  } catch (error) {
+    console.error('Error loading books:', error);
+    books = [];
+    showError('Failed to load books from library');
+  }
+}
+
+function displayBooks(bookList) {
+  const container = document.getElementById('bookContainer');
+  container.innerHTML = '';
+
+  if (bookList.length === 0) {
+    container.innerHTML = '<div class="no-books">No books found</div>';
+    return;
+  }
+
+  bookList.forEach(book => {
+    const isAvailable = book.availableCopies > 0;
+    const card = document.createElement('div');
+    card.className = 'book-card';
+    card.innerHTML = `
+      <img src="${book.imageUrl || 'assets/img/book-placeholder.jpg'}" alt="${book.title}" onerror="this.src='assets/img/book-placeholder.jpg'">
+      <div class="card-body">
+        <h4>${book.title}</h4>
+        <p><b>Author:</b> ${book.author}</p>
+        <p><b>Category:</b> ${book.category}</p>
+        <p><b>ISBN:</b> ${book.isbn}</p>
+        <p><b>Available:</b> ${book.availableCopies}/${book.totalCopies}</p>
+        <div class="book-actions">
+          <button class="btn btn-sm ${isAvailable ? 'btn-primary' : 'btn-secondary disabled'}" onclick="${isAvailable ? `borrowBook('${book._id}')` : ''}" ${!isAvailable ? 'disabled' : ''}>
+            <i class="fas fa-hand-holding"></i> ${isAvailable ? 'Borrow' : 'Unavailable'}
+          </button>
+          <button class="btn btn-sm btn-info" onclick="viewBookDetails('${book._id}')">
+            <i class="fas fa-eye"></i> Details
+          </button>
+        </div>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function searchBooks() {
+  const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+  const filteredBooks = books.filter(book =>
+    book.title.toLowerCase().includes(searchTerm) ||
+    book.author.toLowerCase().includes(searchTerm) ||
+    book.category.toLowerCase().includes(searchTerm) ||
+    book.isbn.toLowerCase().includes(searchTerm)
+  );
+  displayBooks(filteredBooks);
+}
+
+function updateBookStats() {
+  const totalBooks = books.length;
+  const availableBooks = books.filter(book => book.availableCopies > 0).length;
+  const categories = [...new Set(books.map(book => book.category))].length;
+
+  // Update stats if elements exist
+  const totalBooksEl = document.getElementById('totalBooks');
+  const availableBooksEl = document.getElementById('availableBooks');
+  const categoriesEl = document.getElementById('categories');
+
+  if (totalBooksEl) totalBooksEl.textContent = totalBooks;
+  if (availableBooksEl) availableBooksEl.textContent = availableBooks;
+  if (categoriesEl) categoriesEl.textContent = categories;
+}
+
+/* ── Book Actions ── */
+async function borrowBook(bookId) {
+  if (!confirm('Are you sure you want to borrow this book?')) return;
+
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`http://localhost:5000/api/users/borrow/${bookId}`, {
+      method: 'POST',
+      headers: {
+        'x-auth-token': token
+      }
+    });
+
+    if (response.ok) {
+      alert('Book borrowed successfully!');
+      loadBooks(); // Refresh book list
+      loadUserProfile(); // Refresh user profile
+    } else {
+      const error = await response.json();
+      alert(error.msg || 'Failed to borrow book');
+    }
+  } catch (error) {
+    console.error('Error borrowing book:', error);
+    alert('Network error. Please try again.');
+  }
+}
+
+function viewBookDetails(bookId) {
+  const book = books.find(b => b._id === bookId);
+  if (!book) return;
+
+  const details = `
+    Book Details:
+    Title: ${book.title}
+    Author: ${book.author}
+    ISBN: ${book.isbn}
+    Category: ${book.category}
+    Description: ${book.description || 'No description available'}
+    Published: ${book.publishedYear || 'N/A'}
+    Publisher: ${book.publisher || 'N/A'}
+    Location: ${book.location}
+    Available Copies: ${book.availableCopies}/${book.totalCopies}
+  `;
+
+  alert(details);
+}
+
 /* ── Popups ── */
 function openPopup(id) {
   closeAllPopups();
   document.getElementById(id).classList.add('active');
 }
+
 function closeAllPopups() {
   document.querySelectorAll('.popup-overlay').forEach(p => p.classList.remove('active'));
 }
@@ -89,58 +274,6 @@ function sendFeedback() {
   alert('Feedback Sent!');
 }
 
-/* ── Books ── */
-const books = [
-  { title: "DSA", author: "Mark", subject: "Algorithms", id: "1", img: "datastructures.jpeg" },
-  { title: "Python", author: "Guido", subject: "Programming", id: "2", img: "python.jpeg" },
-  { title: "Java", author: "James", subject: "Programming", id: "3", img: "java.jpeg" },
-  { title: "C++", author: "Bjarne", subject: "Programming", id: "4", img: "c++.jpeg" },
-  { title: "C", author: "Dennis", subject: "Programming", id: "5", img: "c.jpeg" },
-  { title: "OS", author: "Silberschatz", subject: "System", id: "6", img: "os.png" },
-  { title: "DBMS", author: "Korth", subject: "Database", id: "7", img: "dbms.jpeg" },
-  { title: "CN", author: "Tanenbaum", subject: "Networking", id: "8", img: "cn.jpg" },
-  { title: "AI", author: "Russell", subject: "AI", id: "9", img: "ai.jpg" },
-  { title: "ML", author: "Tom", subject: "AI", id: "10", img: "machinelearning.jpg" },
-  { title: "JS", author: "Brendan", subject: "Web", id: "11", img: "js.jpeg" },
-  { title: "HTML", author: "W3C", subject: "Web", id: "12", img: "html.jpg" },
-  { title: "CSS", author: "W3C", subject: "Web", id: "13", img: "css.jpg" },
-  { title: "React", author: "Meta", subject: "Web", id: "14", img: "react.jpg" },
-  { title: "Node", author: "Ryan", subject: "Backend", id: "15", img: "node.jpg" },
-  { title: "Django", author: "Adrian", subject: "Backend", id: "16", img: "django.jpg" },
-  { title: "Flask", author: "Armin", subject: "Backend", id: "17", img: "flask.jpg" },
-  { title: "Android", author: "Google", subject: "Mobile", id: "18", img: "android.jpg" },
-  { title: "Swift", author: "Apple", subject: "Mobile", id: "19", img: "swift.jpg" },
-  { title: "Kotlin", author: "JetBrains", subject: "Mobile", id: "20", img: "kotlin.jpg" }
-];
-
-function displayBooks(list) {
-  const c = document.getElementById('bookContainer');
-  c.innerHTML = '';
-  list.forEach(b => {
-    c.innerHTML += `
-      <div class="book-card">
-        <img src="assets/img/${b.img}" alt="${b.title}">
-        <div class="card-body">
-          <h4>${b.title}</h4>
-          <p><b>Author:</b> ${b.author}</p>
-          <p><b>Subject:</b> ${b.subject}</p>
-          <p><b>ID:</b> ${b.id}</p>
-        </div>
-      </div>`;
-  });
-}
-displayBooks(books);
-
-function searchBooks() {
-  let v = document.getElementById('searchInput').value.toLowerCase();
-  displayBooks(books.filter(b =>
-    b.title.toLowerCase().includes(v) ||
-    b.author.toLowerCase().includes(v) ||
-    b.subject.toLowerCase().includes(v) ||
-    b.id.includes(v)
-  ));
-}
-
 /* ── Notifications ── */
 function toggleNotify() { document.getElementById('notifyBox').classList.toggle('active'); }
 
@@ -148,6 +281,25 @@ function loadNotifications() {
   let teacherMsgs = JSON.parse(localStorage.getItem('studentMsg')) || [];
   let dueAlerts = [{ text: '📚 DSA due tomorrow' }, { text: '💰 Fine ₹10 applied' }];
   let all = [...teacherMsgs, ...dueAlerts];
+
+  document.getElementById('notifyCount').textContent = all.length;
+
+  let list = document.getElementById('notifyList');
+  list.innerHTML = '';
+
+  if (all.length === 0) {
+    list.innerHTML = '<div class="notify-item">No new notifications</div>';
+  } else {
+    all.forEach(msg => {
+      list.innerHTML += `<div class="notify-item">${msg.text}</div>`;
+    });
+  }
+}
+
+function showError(message) {
+  console.error(message);
+  alert(message);
+}
   let count = document.getElementById('count');
   let list = document.getElementById('notifyList');
   count.innerText = all.length;

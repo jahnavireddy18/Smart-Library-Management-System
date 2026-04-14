@@ -23,7 +23,7 @@
     <a href="#" class="nav-item" onclick="scrollToID('recommendSection')"><i class="fas fa-book-medical"></i><span>Recommend Book</span></a>
     <a href="#" class="nav-item" onclick="scrollToID('historySection')"><i class="fas fa-history"></i><span>History</span></a>
     <a href="#" class="nav-item" onclick="scrollToID('notifySection')"><i class="fas fa-paper-plane"></i><span>Notify Users</span></a>
-    <a href="index.html" class="nav-item" style="margin-top:auto;"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
+    <a href="#" onclick="logout()" class="nav-item" style="margin-top:auto;"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
   </nav>
 </aside>
 
@@ -129,8 +129,16 @@
 
 </main>
 
+<script src="assets/js/auth.js"></script>
+<script>
+  // Check authentication and role on page load
+  if (!checkRole('teacher')) {
+    // checkRole will handle redirection if authentication fails
+  }
+</script>
+
 <script src="assets/js/teacher_dashboard.js"></script>
 
-<script src="assets/js/voice.js"></script>
+<script src="assets/js/voice-assistant.js"></script>
 </body>
 </html>
